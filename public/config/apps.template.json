@@ -1,0 +1,13 @@
+{
+  "apps": [
+    {
+      "id": "example",
+      "title": "Example App",
+      "shortDescription": "Example application entry",
+      "longDescription": "This is a template for configuring applications in your launcher. Copy this file to apps.json and customize it.",
+      "icon": "/window.svg",
+      "url": "https://example.com",
+      "iconBg": "primary"
+    }
+  ]
+}
