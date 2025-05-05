@@ -41,7 +41,15 @@ export default function AdminPage() {
 
   async function fetchApps() {
     try {
-      const response = await fetch('/config/apps.json');
+      const baseUrl = window.location.origin;
+      const response = await fetch(`${baseUrl}/api/config`, {
+        cache: 'no-store'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
       const data = await response.json() as AppsConfig;
       setApps(data.apps);
       setJsonContent(JSON.stringify(data, null, 2));
@@ -52,7 +60,8 @@ export default function AdminPage() {
 
   async function handleSave(newData: App[]) {
     try {
-      const response = await fetch('/api/admin/save', {
+      const baseUrl = window.location.origin;
+      const response = await fetch(`${baseUrl}/api/admin/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,6 +72,7 @@ export default function AdminPage() {
       if (response.ok) {
         alert('Settings saved successfully!');
         router.refresh();
+        await fetchApps(); // Refresh data after save
       } else {
         alert('Error saving settings');
       }
@@ -78,7 +88,8 @@ export default function AdminPage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('/api/upload', {
+      const baseUrl = window.location.origin;
+      const response = await fetch(`${baseUrl}/api/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -225,7 +236,7 @@ export default function AdminPage() {
                           <label className="label">Icon</label>
                           <div className="flex gap-4 items-start">
                             <div 
-                              className={`relative w-16 h-16 flex items-center justify-center rounded-lg cursor-pointer transition-all hover:opacity-80 bg-${app.iconBg}`}
+                              className={`relative w-16 h-16 flex items-center justify-center rounded-full bg-${app.iconBg}`}
                               onClick={() => handleIconClick(app.id)}
                             >
                               {app.icon ? (

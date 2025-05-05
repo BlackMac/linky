@@ -1,8 +1,6 @@
 import Image from 'next/image';
 import { InfoButton } from './components/InfoButton';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
-import { initializeConfig } from './utils/config';
+import { headers } from 'next/headers';
 
 interface App {
   id: string;
@@ -20,21 +18,26 @@ interface AppsConfig {
 
 async function getApps(): Promise<AppsConfig> {
   try {
-    // Ensure config exists
-    await initializeConfig();
+    const headersList = await headers();
+    const host = headersList.get('host') || '';
+    const proto = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+    const baseUrl = `${proto}://${host}`;
+    
+    const response = await fetch(`${baseUrl}/api/config`, {
+      cache: 'no-store'
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
 
-    // Read the config file
-    const filePath = join(process.cwd(), 'public', 'config', 'apps.json');
-    const fileContent = await readFile(filePath, 'utf8');
-    return JSON.parse(fileContent);
+    return response.json();
   } catch (error) {
-    console.error('Error loading apps configuration:', error);
-    // Return empty configuration
+    console.error('Error loading apps:', error);
     return { apps: [] };
   }
 }
 
-// Make page dynamic to prevent caching
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
