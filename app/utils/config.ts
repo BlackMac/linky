@@ -17,15 +17,22 @@ const defaultConfig = {
 };
 
 export async function initializeConfig() {
-  const configDir = join(process.cwd(), 'public', 'config');
-  const configFile = join(configDir, 'apps.json');
+  // Ensure required directories exist
+  const publicDir = join(process.cwd(), 'public');
+  const configDir = join(publicDir, 'config');
+  const uploadsDir = join(publicDir, 'uploads');
 
-  // Create config directory if it doesn't exist
-  if (!existsSync(configDir)) {
-    await mkdir(configDir, { recursive: true });
+  const dirs = [configDir, uploadsDir];
+
+  // Create directories if they don't exist
+  for (const dir of dirs) {
+    if (!existsSync(dir)) {
+      await mkdir(dir, { recursive: true });
+    }
   }
 
   // Create default config file if it doesn't exist
+  const configFile = join(configDir, 'apps.json');
   if (!existsSync(configFile)) {
     await writeFile(configFile, JSON.stringify(defaultConfig, null, 2), 'utf8');
   }
