@@ -34,6 +34,10 @@ async function getApps(): Promise<AppsConfig> {
   }
 }
 
+// Make page dynamic to prevent caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function Home() {
   const { apps } = await getApps();
 
